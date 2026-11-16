@@ -751,3 +751,172 @@ button, input, textarea, select { font-family: inherit; }
   .footer-grid { grid-template-columns: 1fr; }
   .result-actions { flex-direction: column; }
 }
+
+/* ============================================
+   文字工具实验室（多工具聚合页）
+   ============================================ */
+
+/* 分类标签切换 */
+.lab-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0 28px;
+  padding-bottom: 4px;
+}
+.lab-tab {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-sub);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.lab-tab:hover { border-color: var(--primary); color: var(--primary); text-decoration: none; }
+.lab-tab.active {
+  background: var(--gradient-main);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: var(--shadow-glow);
+}
+
+/* 工具网格 / 单工具布局 */
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+.lab-tool {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.lab-tool-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.lab-tool-icon {
+  font-size: 1.4rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lab-tool-desc {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  line-height: 1.6;
+  margin: -6px 0 0;
+}
+.lab-fields { display: flex; flex-direction: column; gap: 14px; }
+.lab-fields .form-group { margin: 0; }
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-sub);
+  cursor: pointer;
+}
+.check-field input { width: 16px; height: 16px; accent-color: var(--primary); }
+
+.lab-tip {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin: -4px 0 0;
+  padding: 10px 12px;
+  background: var(--bg-soft);
+  border-radius: 10px;
+}
+
+/* 宽布局工具（输入框 + 结果并排） */
+.lab-tool-wide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.lab-tool-wide .lab-tool-input { padding: 28px; border-right: 1px solid var(--border); }
+.lab-tool-wide .lab-tool-output { padding: 28px; background: var(--bg-soft); }
+
+.lab-tool-input { display: flex; flex-direction: column; gap: 16px; }
+.lab-tool-output { display: flex; flex-direction: column; min-height: 200px; }
+.lab-output-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.lab-result-area { flex: 1; max-height: 460px; overflow-y: auto; }
+.lab-result-area .result-list { display: flex; flex-direction: column; gap: 8px; }
+.lab-result-area .result-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.lab-result-area .result-item:hover { border-color: var(--primary); }
+.lab-result-area .result-item.copied { border-color: var(--success, #10b981); background: rgba(16,185,129,.08); }
+.lab-result-area .result-index {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  background: var(--bg-soft);
+  color: var(--text-light);
+  font-size: 0.72rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.lab-result-area .result-text {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text);
+  word-break: break-all;
+  white-space: pre-wrap;
+  margin: 0;
+}
+.lab-result-area .result-copy-hint {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--text-light);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.lab-result-area .result-item:hover .result-copy-hint { opacity: 1; }
+.lab-output-actions { margin-top: 14px; display: flex; gap: 10px; }
+
+@media (max-width: 860px) {
+  .lab-tool-wide { grid-template-columns: 1fr; }
+  .lab-tool-wide .lab-tool-input { border-right: none; border-bottom: 1px solid var(--border); }
+  .lab-tool-wide .lab-tool-output { background: transparent; }
+  .lab-grid { grid-template-columns: 1fr; }
+}

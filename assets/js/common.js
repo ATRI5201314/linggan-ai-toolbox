@@ -54,6 +54,36 @@ const TOOLS = [
     hot: false,
     gradient: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
     soft: '#ede9fe'
+  },
+  {
+    slug: 'nickname',
+    name: '网名生成器大全',
+    icon: '🎮',
+    desc: '空白名、重复名、翅膀、花藤、花体字，一次性集齐所有个性网名工具。',
+    tag: '超多玩法',
+    hot: true,
+    gradient: 'linear-gradient(135deg, #ec4899, #8b5cf6)',
+    soft: '#fce7f3'
+  },
+  {
+    slug: 'text-effect',
+    name: '文字特效生成器',
+    icon: '✨',
+    desc: '居中签名、竖排、倒序、上标、爱心字、火星文，玩转文字花样。',
+    tag: '趣味好玩',
+    hot: false,
+    gradient: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
+    soft: '#e0f2fe'
+  },
+  {
+    slug: 'utility',
+    name: '实用小工具箱',
+    icon: '🔧',
+    desc: '随机密码、金额大写、随机抽奖、文字隐身、诗词起名，日常够用。',
+    tag: '生活常用',
+    hot: false,
+    gradient: 'linear-gradient(135deg, #14b8a6, #22c55e)',
+    soft: '#d1fae5'
   }
 ];
 

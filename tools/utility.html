@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实用小工具箱 - 随机密码/金额大写/随机选择 | 灵感岛</title>
+  <meta name="description" content="免费在线实用小工具：随机密码生成器、人民币金额大写、随机选择器抽奖点名、文字隐身加密、诗词起名，纯本地运行。">
+  <meta name="keywords" content="随机密码生成器,金额大写,人民币大写,随机选择器,抽奖工具,文字隐身,隐身文字解码,诗词起名">
+  <link rel="canonical" href="/tools/utility.html">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116c">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"实用小工具箱","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  </script>
+</head>
+<body data-tool="utility">
+  <header class="site-header" id="siteHeader"></header>
+
+  <main class="main-content tool-page container">
+    <div class="breadcrumb">
+      <a href="/index.html">首页</a><span>›</span><span>实用小工具箱</span>
+    </div>
+
+    <div class="tool-header">
+      <div class="tool-header-icon" data-icon="utility" data-size="64" data-radius="18"></div>
+      <h1>实用小工具箱</h1>
+      <p>随机密码、金额大写、随机抽奖、文字隐身、诗词起名，日常够用</p>
+    </div>
+
+    <nav class="lab-tabs">
+      <a href="/tools/nickname.html" class="lab-tab">🎮 网名昵称</a>
+      <a href="/tools/text-effect.html" class="lab-tab">✨ 文字特效</a>
+      <a href="/tools/utility.html" class="lab-tab active">🔧 实用工具</a>
+    </nav>
+
+    <div class="lab-grid" id="labGrid"></div>
+
+    <div class="ad-container">
+      <div class="ad-label">广告</div>
+      <div class="ad-slot ad-slot-insight">📢 这里插入 Google AdSense 原生广告 / 信息流广告</div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="siteFooter"></footer>
+
+  <script src="/assets/js/icons.js?v=20261116c"></script>
+  <script src="/assets/js/common.js?v=20261116c"></script>
+  <script src="/assets/js/text-engine.js?v=20261116c"></script>
+  <script src="/assets/js/text-lab.js?v=20261116c"></script>
+  <script>
+    const TOOL_IDS = ['password','random-pick','amount','invisible','invisible-decode','poem-name'];
+    document.addEventListener('DOMContentLoaded', function() {
+      const grid = document.getElementById('labGrid');
+      // 为每个工具创建 host 容器并初始化
+      TOOL_IDS.forEach(id => {
+        const host = document.createElement('div');
+        host.id = 'labHost_' + id;
+        host.className = 'lab-tool-wide';
+        grid.appendChild(host);
+      });
+      TextLab.init(TOOL_IDS);
+      if (window.paintIcons) window.paintIcons(document);
+    });
+  </script>
+</body>
+</html>

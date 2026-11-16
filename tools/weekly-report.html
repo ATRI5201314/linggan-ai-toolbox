@@ -10,11 +10,6 @@
   <link rel="stylesheet" href="/assets/css/style.css?v=20261116b">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"SoftwareApplication","name":"周报总结生成器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
-  
-    // 输入框 Ctrl/Cmd + Enter 快速生成
-    document.addEventListener('keydown', function(e){
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); }
-    });
   </script>
 </head>
 <body data-tool="weekly-report">
@@ -194,6 +189,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => renderHistory('historyList', 'weekly-report', restoreHistory));
+    // 输入框 Ctrl/Cmd + Enter 快速生成
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); }
+    });
   </script>
 </body>
 </html>

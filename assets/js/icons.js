@@ -15,6 +15,9 @@
     name:              ['#10b981', '#06b6d4'],   // 取名 - 青绿
     'weekly-report':   ['#3b82f6', '#6366f1'],   // 周报 - 蓝靛
     'eq-reply':        ['#8b5cf6', '#d946ef'],   // 高情商 - 紫品红
+    nickname:          ['#ec4899', '#8b5cf6'],   // 网名 - 粉紫
+    'text-effect':     ['#0ea5e9', '#6366f1'],   // 文字特效 - 天蓝靛
+    utility:           ['#14b8a6', '#22c55e'],   // 实用工具 - 青绿
     sun:               ['#f59e0b', '#f97316'],
     moon:              ['#6366f1', '#8b5cf6'],
     bolt:              ['#6366f1', '#818cf8'],   // 打开即用 - 闪电
@@ -178,6 +181,37 @@
       ctx.fillStyle = '#fff';
       ctx.beginPath(); ctx.moveTo(36, 30); ctx.lineTo(30, 10); ctx.lineTo(46, 22); ctx.closePath(); ctx.fill();
       ctx.beginPath(); ctx.moveTo(64, 30); ctx.lineTo(70, 10); ctx.lineTo(54, 22); ctx.closePath(); ctx.fill();
+    },
+
+    // 网名昵称 - 对话气泡 + 星
+    nickname(ctx) {
+      ctx.fillStyle = '#fff';
+      roundRect(ctx, 18, 22, 64, 46, 12); ctx.fill();
+      // 气泡尾巴
+      ctx.beginPath(); ctx.moveTo(34, 66); ctx.lineTo(30, 82); ctx.lineTo(50, 67); ctx.closePath(); ctx.fill();
+      // 星
+      ctx.fillStyle = THEMES.nickname[0]; drawStar(ctx, 50, 45, 14, 5);
+    },
+
+    // 文字特效 - "文"字风格：A 字 + 闪光
+    'text-effect'(ctx) {
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 58px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('A', 46, 52);
+      // 闪光点
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'; drawStar(ctx, 76, 28, 9, 4);
+      drawStar(ctx, 26, 74, 6, 4);
+    },
+
+    // 实用工具 - 扳手 + 螺丝刀交叉简化
+    utility(ctx) {
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 11; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      // 扳手
+      ctx.beginPath();
+      ctx.arc(38, 38, 15, Math.PI * 0.7, Math.PI * 2.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(48, 48); ctx.lineTo(76, 78); ctx.stroke();
+      // 螺丝刀
+      ctx.beginPath(); ctx.moveTo(70, 26); ctx.lineTo(46, 50); ctx.stroke();
     },
 
     // 默认文档

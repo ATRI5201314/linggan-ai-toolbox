@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网名生成器大全 - 空白名/重复名/翅膀/花藤昵称 | 灵感岛</title>
+  <meta name="description" content="免费网名生成工具箱：王者荣耀重复名、空白昵称、翅膀昵称、花藤昵称、花样字体、符号网名、花体英文字母，花样无限，一键复制。">
+  <meta name="keywords" content="网名生成器,空白名,重复名,王者荣耀重复名,翅膀昵称,花藤昵称,花样字体,符号网名,花体字">
+  <link rel="canonical" href="/tools/nickname.html">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116c">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"网名生成器大全","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  </script>
+</head>
+<body data-tool="nickname">
+  <header class="site-header" id="siteHeader"></header>
+
+  <main class="main-content tool-page container">
+    <div class="breadcrumb">
+      <a href="/index.html">首页</a><span>›</span><span>网名生成器大全</span>
+    </div>
+
+    <div class="tool-header">
+      <div class="tool-header-icon" data-icon="nickname" data-size="64" data-radius="18"></div>
+      <h1>网名生成器大全</h1>
+      <p>空白名、重复名、翅膀、花藤、花体字……一次性集齐所有个性网名工具</p>
+    </div>
+
+    <nav class="lab-tabs">
+      <a href="/tools/nickname.html" class="lab-tab active">🎮 网名昵称</a>
+      <a href="/tools/text-effect.html" class="lab-tab">✨ 文字特效</a>
+      <a href="/tools/utility.html" class="lab-tab">🔧 实用工具</a>
+    </nav>
+
+    <div class="lab-grid" id="labGrid"></div>
+
+    <div class="ad-container">
+      <div class="ad-label">广告</div>
+      <div class="ad-slot ad-slot-insight">📢 这里插入 Google AdSense 原生广告 / 信息流广告</div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="siteFooter"></footer>
+
+  <script src="/assets/js/icons.js?v=20261116c"></script>
+  <script src="/assets/js/common.js?v=20261116c"></script>
+  <script src="/assets/js/text-engine.js?v=20261116c"></script>
+  <script src="/assets/js/text-lab.js?v=20261116c"></script>
+  <script>
+    const TOOL_IDS = ['repeat-name','blank-name','wing-name','vine-name','fancy-pattern','symbol-name','fancy-font'];
+    document.addEventListener('DOMContentLoaded', function() {
+      const grid = document.getElementById('labGrid');
+      // 为每个工具创建 host 容器并初始化
+      TOOL_IDS.forEach(id => {
+        const host = document.createElement('div');
+        host.id = 'labHost_' + id;
+        host.className = 'lab-tool-wide';
+        grid.appendChild(host);
+      });
+      TextLab.init(TOOL_IDS);
+      if (window.paintIcons) window.paintIcons(document);
+    });
+  </script>
+</body>
+</html>

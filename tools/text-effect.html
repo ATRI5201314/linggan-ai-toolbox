@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文字特效生成器 - 居中签名/竖排/倒序/花体字 | 灵感岛</title>
+  <meta name="description" content="免费文字特效工具箱：居中签名、竖排文字、文字倒序、上标下标、520爱心文字、尖叫字体、火星文、简繁转换，一键生成。">
+  <meta name="keywords" content="文字特效,居中签名,竖排文字,文字倒序,上标下标,520爱心文字,尖叫字体,火星文,繁体转换">
+  <link rel="canonical" href="/tools/text-effect.html">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116c">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"文字特效生成器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  </script>
+</head>
+<body data-tool="text-effect">
+  <header class="site-header" id="siteHeader"></header>
+
+  <main class="main-content tool-page container">
+    <div class="breadcrumb">
+      <a href="/index.html">首页</a><span>›</span><span>文字特效生成器</span>
+    </div>
+
+    <div class="tool-header">
+      <div class="tool-header-icon" data-icon="text-effect" data-size="64" data-radius="18"></div>
+      <h1>文字特效生成器</h1>
+      <p>居中签名、竖排文字、倒序、上标、爱心字、火星文……玩转文字花样</p>
+    </div>
+
+    <nav class="lab-tabs">
+      <a href="/tools/nickname.html" class="lab-tab">🎮 网名昵称</a>
+      <a href="/tools/text-effect.html" class="lab-tab active">✨ 文字特效</a>
+      <a href="/tools/utility.html" class="lab-tab">🔧 实用工具</a>
+    </nav>
+
+    <div class="lab-grid" id="labGrid"></div>
+
+    <div class="ad-container">
+      <div class="ad-label">广告</div>
+      <div class="ad-slot ad-slot-insight">📢 这里插入 Google AdSense 原生广告 / 信息流广告</div>
+    </div>
+  </main>
+
+  <footer class="site-footer" id="siteFooter"></footer>
+
+  <script src="/assets/js/icons.js?v=20261116c"></script>
+  <script src="/assets/js/common.js?v=20261116c"></script>
+  <script src="/assets/js/text-engine.js?v=20261116c"></script>
+  <script src="/assets/js/text-lab.js?v=20261116c"></script>
+  <script>
+    const TOOL_IDS = ['center-sign','vertical-text','reverse-text','sup-text','love-text','scream-text','mars-text','traditional'];
+    document.addEventListener('DOMContentLoaded', function() {
+      const grid = document.getElementById('labGrid');
+      // 为每个工具创建 host 容器并初始化
+      TOOL_IDS.forEach(id => {
+        const host = document.createElement('div');
+        host.id = 'labHost_' + id;
+        host.className = 'lab-tool-wide';
+        grid.appendChild(host);
+      });
+      TextLab.init(TOOL_IDS);
+      if (window.paintIcons) window.paintIcons(document);
+    });
+  </script>
+</body>
+</html>
