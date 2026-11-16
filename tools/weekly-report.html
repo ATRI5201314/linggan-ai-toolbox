@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周报总结生成器 - 一键生成专业工作周报 | 灵感岛</title>
+  <meta name="description" content="免费周报总结生成器，把零散的工作内容变成结构清晰、重点突出的专业周报，职场汇报不求人。">
+  <meta name="keywords" content="周报生成,周报模板,工作总结,工作周报,周报生成器,AI周报">
+  <link rel="canonical" href="/tools/weekly-report.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"周报总结生成器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  </script>
+</head>
+<body data-tool="weekly-report">
+  <header class="site-header" id="siteHeader"></header>
+
+  <main class="main-content tool-page container">
+    <div class="breadcrumb">
+      <a href="/index.html">首页</a><span>›</span><span>周报总结生成器</span>
+    </div>
+
+    <div class="tool-header">
+      <div class="tool-header-icon" style="background:#dbeafe;">📝</div>
+      <h1>周报总结生成器</h1>
+      <p>把零散工作变成专业周报，结构清晰、重点突出，汇报不求人</p>
+    </div>
+
+    <div class="tool-workspace">
+      <div class="panel">
+        <h2 class="panel-title"><span class="step-num">1</span>填写工作</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="workInput">本周工作内容 <span class="form-hint">简单罗列即可，越具体越好</span></label>
+          <textarea class="textarea" id="workInput" placeholder="例如：完成了首页改版设计、对接了3个客户需求、参加了产品评审会..." style="min-height:140px;">完成了产品首页改版设计，对接了三个客户需求，参加了产品评审会并输出纪要，优化了注册流程的用户体验。</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="nameInput">姓名 / 岗位 <span class="form-hint">选填</span></label>
+          <input class="input" type="text" id="nameInput" placeholder="如：张三 / 产品经理（选填）">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">周报风格</label>
+          <div class="chip-group" id="styleChips">
+            <span class="chip active" data-value="简洁">⚡ 简洁</span>
+            <span class="chip" data-value="详细">📋 详细</span>
+            <span class="chip" data-value="数据化">📊 数据化</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" id="generateBtn" onclick="handleGenerate()">📝 生成周报</button>
+      </div>
+
+      <div class="panel result-panel">
+        <h2 class="panel-title"><span class="step-num">2</span>生成结果</h2>
+        <div id="resultArea">
+          <div class="result-empty">
+            <div class="result-empty-icon">📝</div>
+            <p>填写工作内容并点击生成<br>专业周报会出现在这里</p>
+          </div>
+        </div>
+        <div class="result-actions" id="resultActions" style="display:none;">
+          <button class="btn btn-outline" onclick="copyAll()">📋 复制全部</button>
+          <button class="btn btn-ghost" onclick="handleGenerate()">🔄 重新生成</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-container">
+      <div class="ad-label">广告</div>
+      <div class="ad-slot ad-slot-insight">📢 这里插入 Google AdSense 原生广告 / 信息流广告</div>
+    </div>
+
+    <section class="history-section" id="historySection">
+      <h2 class="section-title" style="font-size:1.3rem;">🕐 最近生成</h2>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="siteFooter"></footer>
+
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/ai-engine.js"></script>
+  <script>
+    let currentResults = [], currentParams = {};
+
+    document.querySelectorAll('#styleChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('#styleChips .chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    function getSelectedStyle() {
+      const el = document.querySelector('#styleChips .chip.active');
+      return el ? el.dataset.value : '简洁';
+    }
+
+    async function handleGenerate() {
+      const work = document.getElementById('workInput').value.trim();
+      if (!work) { showToast('请先填写本周工作内容'); return; }
+      const name = document.getElementById('nameInput').value.trim();
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
+      document.getElementById('resultArea').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p>正在整理你的工作周报...</p></div>`;
+      document.getElementById('resultActions').style.display = 'none';
+
+      try {
+        currentParams = { work, style: getSelectedStyle(), name };
+        let results = await generate('weekly-report', currentParams);
+        // 如果有姓名，加个开头
+        if (name && results[0] && results[0].title) {
+          results = [{ title: '👤 汇报人', content: name }, ...results];
+        }
+        currentResults = results;
+        renderResults();
+        saveHistory('weekly-report', currentParams, currentResults);
+        renderHistory('historyList', 'weekly-report', restoreHistory);
+      } catch (e) {
+        showToast('生成失败，请重试'); console.error(e);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '📝 生成周报';
+      }
+    }
+
+    function renderResults() {
+      const area = document.getElementById('resultArea');
+      // 兼容两种格式：{title,content} 对象数组 或 纯字符串数组
+      const isObjects = currentResults.length && typeof currentResults[0] === 'object';
+      let html = '';
+      if (isObjects) {
+        html = currentResults.map((item, i) => `
+          <div class="result-item" style="cursor:default;" onclick="copyResult(${i}, this)">
+            <p class="result-text" style="font-weight:700;color:var(--primary);padding-right:28px;margin-bottom:8px;">${escapeHtml(item.title)}</p>
+            <p class="result-text" style="white-space:pre-wrap;">${escapeHtml(item.content)}</p>
+            <span class="result-copy-hint">📋 点击复制此段</span>
+          </div>
+        `).join('');
+      } else {
+        html = currentResults.map((text, i) => `
+          <div class="result-item" onclick="copyResult(${i}, this)">
+            <span class="result-index">${i + 1}</span>
+            <p class="result-text">${escapeHtml(text)}</p>
+            <span class="result-copy-hint">📋 点击复制</span>
+          </div>
+        `).join('');
+      }
+      area.innerHTML = `<div class="result-list">${html}</div>`;
+      document.getElementById('resultActions').style.display = 'flex';
+    }
+
+    function getResultText(item) {
+      return (item && typeof item === 'object') ? `${item.title}\n${item.content}` : item;
+    }
+    async function copyResult(i, el) { await copyText(getResultText(currentResults[i])); el.classList.add('copied'); setTimeout(() => el.classList.remove('copied'), 800); }
+    async function copyAll() {
+      const text = currentResults.map(getResultText).join('\n\n');
+      await copyText(text);
+    }
+
+    function restoreHistory(record) {
+      document.getElementById('workInput').value = record.inputs.work || '';
+      document.getElementById('nameInput').value = record.inputs.name || '';
+      document.querySelectorAll('#styleChips .chip').forEach(c => c.classList.toggle('active', c.dataset.value === record.inputs.style));
+      currentParams = record.inputs;
+      currentResults = record.results;
+      renderResults();
+      showToast('已恢复历史记录');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => renderHistory('historyList', 'weekly-report', restoreHistory));
+  </script>
+</body>
+</html>

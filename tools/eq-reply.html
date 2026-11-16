@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高情商回复助手 - 各种场景的得体话术 | 灵感岛</title>
+  <meta name="description" content="免费高情商回复助手，针对同事、朋友、恋人、长辈、客户等各种关系场景，生成得体自然的高情商话术，聊天不再尴尬。">
+  <meta name="keywords" content="高情商回复,高情商聊天,回话技巧,聊天话术,怎么回复,情商话术生成">
+  <link rel="canonical" href="/tools/eq-reply.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"高情商回复助手","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  </script>
+</head>
+<body data-tool="eq-reply">
+  <header class="site-header" id="siteHeader"></header>
+
+  <main class="main-content tool-page container">
+    <div class="breadcrumb">
+      <a href="/index.html">首页</a><span>›</span><span>高情商回复助手</span>
+    </div>
+
+    <div class="tool-header">
+      <div class="tool-header-icon" style="background:#ede9fe;">✨</div>
+      <h1>高情商回复助手</h1>
+      <p>尴尬聊天不用慌，高情商话术帮你优雅回应各种难接的场景</p>
+    </div>
+
+    <div class="tool-workspace">
+      <div class="panel">
+        <h2 class="panel-title"><span class="step-num">1</span>填写场景</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="situationInput">对方说了什么 / 当前场景 <span class="form-hint">描述得越具体，回复越贴合</span></label>
+          <textarea class="textarea" id="situationInput" placeholder="例如：同事把他的工作推给我，我不想接但又不好拒绝..." style="min-height:110px;">同事想把他负责的工作推给我，我不想接但又不好直接拒绝</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">对方身份</label>
+          <div class="chip-group" id="relationChips">
+            <span class="chip active" data-value="同事">👔 同事</span>
+            <span class="chip" data-value="朋友">👫 朋友</span>
+            <span class="chip" data-value="恋人">💕 恋人</span>
+            <span class="chip" data-value="长辈">👴 长辈</span>
+            <span class="chip" data-value="客户">🤝 客户</span>
+            <span class="chip" data-value="暧昧">😉 暧昧</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" id="generateBtn" onclick="handleGenerate()">✨ 生成回复</button>
+      </div>
+
+      <div class="panel result-panel">
+        <h2 class="panel-title"><span class="step-num">2</span>生成结果 <span style="margin-left:auto;font-size:0.8rem;font-weight:400;color:var(--text-light);">点击即可复制</span></h2>
+        <div id="resultArea">
+          <div class="result-empty">
+            <div class="result-empty-icon">✨</div>
+            <p>填写场景并点击生成<br>高情商回复会出现在这里</p>
+          </div>
+        </div>
+        <div class="result-actions" id="resultActions" style="display:none;">
+          <button class="btn btn-outline" onclick="copyAll()">📋 复制全部</button>
+          <button class="btn btn-ghost" onclick="handleGenerate()">🔄 换一批</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-container">
+      <div class="ad-label">广告</div>
+      <div class="ad-slot ad-slot-insight">📢 这里插入 Google AdSense 原生广告 / 信息流广告</div>
+    </div>
+
+    <section class="history-section" id="historySection">
+      <h2 class="section-title" style="font-size:1.3rem;">🕐 最近生成</h2>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="siteFooter"></footer>
+
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/ai-engine.js"></script>
+  <script>
+    let currentResults = [], currentParams = {};
+
+    document.querySelectorAll('#relationChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('#relationChips .chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    function getSelectedRelation() {
+      const el = document.querySelector('#relationChips .chip.active');
+      return el ? el.dataset.value : '同事';
+    }
+
+    async function handleGenerate() {
+      const situation = document.getElementById('situationInput').value.trim();
+      if (!situation) { showToast('请先描述一下场景'); return; }
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
+      document.getElementById('resultArea').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p>正在帮你想得体回复...</p></div>`;
+      document.getElementById('resultActions').style.display = 'none';
+
+      try {
+        currentParams = { situation, relation: getSelectedRelation(), count: 5 };
+        currentResults = await generate('eq-reply', currentParams);
+        renderResults();
+        saveHistory('eq-reply', currentParams, currentResults);
+        renderHistory('historyList', 'eq-reply', restoreHistory);
+      } catch (e) {
+        showToast('生成失败，请重试'); console.error(e);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✨ 生成回复';
+      }
+    }
+
+    function renderResults() {
+      document.getElementById('resultArea').innerHTML = `
+        <div class="result-list">
+          ${currentResults.map((text, i) => `
+            <div class="result-item" onclick="copyResult(${i}, this)">
+              <span class="result-index">${i + 1}</span>
+              <p class="result-text">${escapeHtml(text)}</p>
+              <span class="result-copy-hint">📋 点击复制</span>
+            </div>
+          `).join('')}
+        </div>`;
+      document.getElementById('resultActions').style.display = 'flex';
+    }
+
+    async function copyResult(i, el) { await copyText(currentResults[i]); el.classList.add('copied'); setTimeout(() => el.classList.remove('copied'), 800); }
+    async function copyAll() { await copyText(currentResults.join('\n\n')); }
+
+    function restoreHistory(record) {
+      document.getElementById('situationInput').value = record.inputs.situation || '';
+      document.querySelectorAll('#relationChips .chip').forEach(c => c.classList.toggle('active', c.dataset.value === record.inputs.relation));
+      currentParams = record.inputs;
+      currentResults = record.results;
+      renderResults();
+      showToast('已恢复历史记录');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => renderHistory('historyList', 'eq-reply', restoreHistory));
+  </script>
+</body>
+</html>

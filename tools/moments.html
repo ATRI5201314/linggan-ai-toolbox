@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>朋友圈文案生成器 - 一键生成走心文案 | 灵感岛</title>
+  <meta name="description" content="免费朋友圈文案生成器，输入场景一键生成文艺、搞笑、励志、扎心等多种风格的朋友圈文案，发朋友圈不再纠结。">
+  <meta name="keywords" content="朋友圈文案,朋友圈文案生成器,发朋友圈文案,文案生成,AI文案">
+  <link rel="canonical" href="/tools/moments.html">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"朋友圈文案生成器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  </script>
+</head>
+<body data-tool="moments">
+  <header class="site-header" id="siteHeader"></header>
+
+  <main class="main-content tool-page container">
+    <div class="breadcrumb">
+      <a href="/index.html">首页</a><span>›</span><span>朋友圈文案生成器</span>
+    </div>
+
+    <div class="tool-header">
+      <div class="tool-header-icon" style="background:#fef3c7;">💬</div>
+      <h1>朋友圈文案生成器</h1>
+      <p>输入你想表达的内容，一键生成多风格文案，发圈不再纠结</p>
+    </div>
+
+    <div class="tool-workspace">
+      <!-- 输入面板 -->
+      <div class="panel">
+        <h2 class="panel-title"><span class="step-num">1</span>填写内容</h2>
+
+        <div class="form-group">
+          <label class="form-label" for="topicInput">文案主题 / 场景 <span class="form-hint">如：周末去爬山、加班到深夜、新买的咖啡</span></label>
+          <textarea class="textarea" id="topicInput" placeholder="简单描述你想发朋友圈的内容..." style="min-height:90px;">周末去爬山</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">选择风格</label>
+          <div class="chip-group" id="styleChips">
+            <span class="chip active" data-value="文艺">🌿 文艺</span>
+            <span class="chip" data-value="搞笑">😂 搞笑</span>
+            <span class="chip" data-value="励志">💪 励志</span>
+            <span class="chip" data-value="扎心">💔 扎心</span>
+            <span class="chip" data-value="简洁">✨ 简洁</span>
+            <span class="chip" data-value="卖货">🛍️ 卖货</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" id="generateBtn" onclick="handleGenerate()">✨ 生成文案</button>
+      </div>
+
+      <!-- 结果面板 -->
+      <div class="panel result-panel">
+        <h2 class="panel-title"><span class="step-num">2</span>生成结果 <span style="margin-left:auto;font-size:0.8rem;font-weight:400;color:var(--text-light);">点击即可复制</span></h2>
+        <div id="resultArea">
+          <div class="result-empty">
+            <div class="result-empty-icon">💬</div>
+            <p>填写内容并点击生成<br>文案会出现在这里</p>
+          </div>
+        </div>
+        <div class="result-actions" id="resultActions" style="display:none;">
+          <button class="btn btn-outline" onclick="copyAll()">📋 复制全部</button>
+          <button class="btn btn-ghost" onclick="handleGenerate()">🔄 换一批</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 广告位 -->
+    <div class="ad-container">
+      <div class="ad-label">广告</div>
+      <div class="ad-slot ad-slot-insight">📢 这里插入 Google AdSense 原生广告 / 信息流广告</div>
+    </div>
+
+    <!-- 历史记录 -->
+    <section class="history-section" id="historySection">
+      <h2 class="section-title" style="font-size:1.3rem;">🕐 最近生成</h2>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="siteFooter"></footer>
+
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/ai-engine.js"></script>
+  <script>
+    let currentResults = [];
+    let currentParams = {};
+
+    // 芯片选择
+    document.querySelectorAll('#styleChips .chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('#styleChips .chip').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    function getSelectedStyle() {
+      const el = document.querySelector('#styleChips .chip.active');
+      return el ? el.dataset.value : '文艺';
+    }
+
+    async function handleGenerate() {
+      const topic = document.getElementById('topicInput').value.trim();
+      if (!topic) { showToast('请先填写文案主题'); return; }
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
+
+      document.getElementById('resultArea').innerHTML = `
+        <div class="loading-wrap"><div class="spinner"></div><p>正在为你创作文案...</p></div>`;
+      document.getElementById('resultActions').style.display = 'none';
+
+      try {
+        currentParams = { topic, style: getSelectedStyle() };
+        currentResults = await generate('moments', currentParams);
+        renderResults();
+        saveHistory('moments', currentParams, currentResults);
+        renderHistory('historyList', 'moments', restoreHistory);
+      } catch (e) {
+        showToast('生成失败，请重试');
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✨ 生成文案';
+      }
+    }
+
+    function renderResults() {
+      const area = document.getElementById('resultArea');
+      area.innerHTML = `
+        <div class="result-list">
+          ${currentResults.map((text, i) => `
+            <div class="result-item" onclick="copyResult(${i}, this)">
+              <span class="result-index">${i + 1}</span>
+              <p class="result-text">${escapeHtml(text)}</p>
+              <span class="result-copy-hint">📋 点击复制</span>
+            </div>
+          `).join('')}
+        </div>`;
+      document.getElementById('resultActions').style.display = 'flex';
+    }
+
+    async function copyResult(index, el) {
+      await copyText(currentResults[index]);
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 800);
+    }
+
+    async function copyAll() {
+      await copyText(currentResults.join('\n\n'));
+    }
+
+    function restoreHistory(record) {
+      document.getElementById('topicInput').value = record.inputs.topic || '';
+      document.querySelectorAll('#styleChips .chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.value === record.inputs.style);
+      });
+      currentParams = record.inputs;
+      currentResults = record.results;
+      renderResults();
+      showToast('已恢复历史记录');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderHistory('historyList', 'moments', restoreHistory);
+    });
+  </script>
+</body>
+</html>
