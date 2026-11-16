@@ -1,5 +1,5 @@
 # 灵感岛 AI工具箱 robots.txt
-# 将 your-domain.com 替换为你的实际域名
+# 将 atri5201314.github.io/linggan-ai-toolbox 替换为你的实际域名
 
 User-agent: *
 Allow: /
