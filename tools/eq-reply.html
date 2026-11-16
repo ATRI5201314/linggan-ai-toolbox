@@ -7,9 +7,14 @@
   <meta name="description" content="免费高情商回复助手，针对同事、朋友、恋人、长辈、客户等各种关系场景，生成得体自然的高情商话术，聊天不再尴尬。">
   <meta name="keywords" content="高情商回复,高情商聊天,回话技巧,聊天话术,怎么回复,情商话术生成">
   <link rel="canonical" href="/tools/eq-reply.html">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116b">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"SoftwareApplication","name":"高情商回复助手","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  
+    // 输入框 Ctrl/Cmd + Enter 快速生成
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); }
+    });
   </script>
 </head>
 <body data-tool="eq-reply">
@@ -21,7 +26,7 @@
     </div>
 
     <div class="tool-header">
-      <div class="tool-header-icon" style="background:#ede9fe;">✨</div>
+      <div class="tool-header-icon" data-icon="eq-reply" data-size="64" data-radius="18"></div>
       <h1>高情商回复助手</h1>
       <p>尴尬聊天不用慌，高情商话术帮你优雅回应各种难接的场景</p>
     </div>
@@ -78,8 +83,9 @@
 
   <footer class="site-footer" id="siteFooter"></footer>
 
-  <script src="/assets/js/common.js"></script>
-  <script src="/assets/js/ai-engine.js"></script>
+  <script src="/assets/js/icons.js?v=20261116b"></script>
+  <script src="/assets/js/common.js?v=20261116b"></script>
+  <script src="/assets/js/ai-engine.js?v=20261116b"></script>
   <script>
     let currentResults = [], currentParams = {};
 
@@ -94,27 +100,42 @@
       return el ? el.dataset.value : '同事';
     }
 
-    async function handleGenerate() {
-      const situation = document.getElementById('situationInput').value.trim();
-      if (!situation) { showToast('请先描述一下场景'); return; }
+    let _busy = false;
 
+    async function handleGenerate() {
+      if (_busy) return;
+
+      const topicInput = document.getElementById('topicInput') || document.getElementById('workInput') || document.getElementById('keywordInput') || document.getElementById('situationInput');
+      const rawVal = topicInput ? topicInput.value.trim() : '';
+      // 只有朋友圈/标题/周报/高情商需要非空校验；取名允许为空
+      const needInput = true;
+      if (needInput && !rawVal) { showToast('请先填写内容'); return; }
+
+      _busy = true;
       const btn = document.getElementById('generateBtn');
+      const origHtml = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
-      document.getElementById('resultArea').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p>正在帮你想得体回复...</p></div>`;
-      document.getElementById('resultActions').style.display = 'none';
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;"></span> 生成中...';
+
+      const resultArea = document.getElementById('resultArea');
+      if (resultArea) resultArea.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p>正在生成，请稍候...</p></div>';
+      const actions = document.getElementById('resultActions');
+      if (actions) actions.style.display = 'none';
 
       try {
-        currentParams = { situation, relation: getSelectedRelation(), count: 5 };
+        currentParams = { situation: topicInput.value.trim(), relation: getSelectedRelation(), count: 5 };
         currentResults = await generate('eq-reply', currentParams);
         renderResults();
         saveHistory('eq-reply', currentParams, currentResults);
         renderHistory('historyList', 'eq-reply', restoreHistory);
       } catch (e) {
-        showToast('生成失败，请重试'); console.error(e);
+        showToast('生成失败，请重试');
+        console.error(e);
+        if (resultArea) resultArea.innerHTML = '<div class="result-empty"><div class="result-empty-icon">😕</div><p>生成失败，请点击重试</p></div>';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '✨ 生成回复';
+        _busy = false;
       }
     }
 

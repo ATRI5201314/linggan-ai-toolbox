@@ -91,7 +91,16 @@ function toggleTheme() {
 
 function updateThemeIcon(theme) {
   const btn = document.getElementById('themeToggle');
-  if (btn) btn.textContent = theme === 'light' ? '🌙' : '☀️';
+  if (!btn || !window.Icons) return;
+  // 浅色主题显示月亮，深色主题显示太阳
+  const type = theme === 'light' ? 'moon' : 'sun';
+  btn.innerHTML = '';
+  btn.appendChild(window.Icons.createIcon(type, 20, 6));
+}
+
+// 重新渲染页面内所有 Canvas 图标（动态注入内容后调用）
+function refreshIcons() {
+  if (window.Icons) window.Icons.paintIcons(document);
 }
 
 /* ---------- 注入 Header ---------- */
@@ -99,21 +108,23 @@ function injectHeader(activeSlug) {
   const header = document.getElementById('siteHeader');
   if (!header) return;
   const navLinks = TOOLS.map(t =>
-    `<a href="/tools/${t.slug}.html" class="${activeSlug === t.slug ? 'active' : ''}">${t.icon} ${t.name}</a>`
+    `<a href="/tools/${t.slug}.html" class="${activeSlug === t.slug ? 'active' : ''}"><span class="nav-icon" data-icon="${t.slug}" data-size="18" data-radius="5"></span>${t.name}</a>`
   ).join('');
   header.innerHTML = `
     <div class="header-inner">
       <a href="/index.html" class="logo">
-        <span class="logo-icon">🏝️</span>
+        <span class="logo-icon" data-icon="logo" data-size="36" data-radius="10"></span>
         <span>灵感<span class="logo-gradient">岛</span></span>
       </a>
       <nav class="nav-links" id="navLinks">
-        <a href="/index.html" class="${!activeSlug ? 'active' : ''}">首页</a>
+        <a href="/index.html" class="${!activeSlug ? 'active' : ''}"><span class="nav-icon" data-icon="logo" data-size="18" data-radius="5"></span>首页</a>
         ${navLinks}
       </nav>
       <div class="header-actions">
-        <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="切换主题">🌙</button>
-        <button class="icon-btn mobile-menu-btn" onclick="document.getElementById('navLinks').classList.toggle('open')" title="菜单">☰</button>
+        <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="切换主题"></button>
+        <button class="icon-btn mobile-menu-btn" onclick="document.getElementById('navLinks').classList.toggle('open')" title="菜单">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
       </div>
     </div>
   `;
@@ -131,7 +142,7 @@ function injectFooter() {
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="/index.html" class="logo">
-            <span class="logo-icon">🏝️</span>
+            <span class="logo-icon" data-icon="logo" data-size="36" data-radius="10"></span>
             <span>灵感<span class="logo-gradient">岛</span></span>
           </a>
           <p>让每一次创作都有灵感。提供简单、好用、免费的 AI 效率工具，帮你把想法变成成果。</p>
@@ -232,7 +243,7 @@ function renderHistory(containerId, toolSlug, onRestore) {
     const preview = (r.results && r.results[0]) || JSON.stringify(r.inputs) || '';
     return `
       <div class="history-item" data-id="${r.id}">
-        <div class="history-item-icon">${tool ? tool.icon : '📄'}</div>
+        <div class="history-item-icon" data-icon="${tool ? tool.slug : 'doc'}" data-size="38" data-radius="10"></div>
         <div class="history-item-body" style="cursor:pointer;" onclick="window._restoreHistory(${r.id})">
           <div class="history-item-title">${tool ? tool.name : '生成记录'}</div>
           <div class="history-item-preview">${escapeHtml(preview).slice(0, 60)}</div>
@@ -241,6 +252,9 @@ function renderHistory(containerId, toolSlug, onRestore) {
       </div>
     `;
   }).join('');
+
+  // 渲染历史图标
+  refreshIcons();
 
   // 绑定恢复回调
   window._restoreHistory = function(id) {
@@ -261,4 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initTheme();
   injectHeader(document.body.dataset.tool || '');
   injectFooter();
+  // 注入导航/页脚后渲染 Canvas 图标，并初始化主题按钮图标
+  refreshIcons();
+  updateThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
 });

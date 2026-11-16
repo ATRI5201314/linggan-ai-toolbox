@@ -7,9 +7,14 @@
   <meta name="description" content="免费朋友圈文案生成器，输入场景一键生成文艺、搞笑、励志、扎心等多种风格的朋友圈文案，发朋友圈不再纠结。">
   <meta name="keywords" content="朋友圈文案,朋友圈文案生成器,发朋友圈文案,文案生成,AI文案">
   <link rel="canonical" href="/tools/moments.html">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116b">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"SoftwareApplication","name":"朋友圈文案生成器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  
+    // 输入框 Ctrl/Cmd + Enter 快速生成
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); }
+    });
   </script>
 </head>
 <body data-tool="moments">
@@ -21,7 +26,7 @@
     </div>
 
     <div class="tool-header">
-      <div class="tool-header-icon" style="background:#fef3c7;">💬</div>
+      <div class="tool-header-icon" data-icon="moments" data-size="64" data-radius="18"></div>
       <h1>朋友圈文案生成器</h1>
       <p>输入你想表达的内容，一键生成多风格文案，发圈不再纠结</p>
     </div>
@@ -82,8 +87,9 @@
 
   <footer class="site-footer" id="siteFooter"></footer>
 
-  <script src="/assets/js/common.js"></script>
-  <script src="/assets/js/ai-engine.js"></script>
+  <script src="/assets/js/icons.js?v=20261116b"></script>
+  <script src="/assets/js/common.js?v=20261116b"></script>
+  <script src="/assets/js/ai-engine.js?v=20261116b"></script>
   <script>
     let currentResults = [];
     let currentParams = {};
@@ -101,20 +107,30 @@
       return el ? el.dataset.value : '文艺';
     }
 
+    let _busy = false;
+
     async function handleGenerate() {
-      const topic = document.getElementById('topicInput').value.trim();
-      if (!topic) { showToast('请先填写文案主题'); return; }
+      if (_busy) return;
 
+      const topicInput = document.getElementById('topicInput') || document.getElementById('workInput') || document.getElementById('keywordInput') || document.getElementById('situationInput');
+      const rawVal = topicInput ? topicInput.value.trim() : '';
+      // 只有朋友圈/标题/周报/高情商需要非空校验；取名允许为空
+      const needInput = true;
+      if (needInput && !rawVal) { showToast('请先填写内容'); return; }
+
+      _busy = true;
       const btn = document.getElementById('generateBtn');
+      const origHtml = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;"></span> 生成中...';
 
-      document.getElementById('resultArea').innerHTML = `
-        <div class="loading-wrap"><div class="spinner"></div><p>正在为你创作文案...</p></div>`;
-      document.getElementById('resultActions').style.display = 'none';
+      const resultArea = document.getElementById('resultArea');
+      if (resultArea) resultArea.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p>正在生成，请稍候...</p></div>';
+      const actions = document.getElementById('resultActions');
+      if (actions) actions.style.display = 'none';
 
       try {
-        currentParams = { topic, style: getSelectedStyle() };
+        currentParams = { topic: topicInput.value.trim(), style: getSelectedStyle() };
         currentResults = await generate('moments', currentParams);
         renderResults();
         saveHistory('moments', currentParams, currentResults);
@@ -122,9 +138,11 @@
       } catch (e) {
         showToast('生成失败，请重试');
         console.error(e);
+        if (resultArea) resultArea.innerHTML = '<div class="result-empty"><div class="result-empty-icon">😕</div><p>生成失败，请点击重试</p></div>';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '✨ 生成文案';
+        _busy = false;
       }
     }
 

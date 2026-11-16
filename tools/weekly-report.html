@@ -7,9 +7,14 @@
   <meta name="description" content="免费周报总结生成器，把零散的工作内容变成结构清晰、重点突出的专业周报，职场汇报不求人。">
   <meta name="keywords" content="周报生成,周报模板,工作总结,工作周报,周报生成器,AI周报">
   <link rel="canonical" href="/tools/weekly-report.html">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116b">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"SoftwareApplication","name":"周报总结生成器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  
+    // 输入框 Ctrl/Cmd + Enter 快速生成
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); }
+    });
   </script>
 </head>
 <body data-tool="weekly-report">
@@ -21,7 +26,7 @@
     </div>
 
     <div class="tool-header">
-      <div class="tool-header-icon" style="background:#dbeafe;">📝</div>
+      <div class="tool-header-icon" data-icon="weekly-report" data-size="64" data-radius="18"></div>
       <h1>周报总结生成器</h1>
       <p>把零散工作变成专业周报，结构清晰、重点突出，汇报不求人</p>
     </div>
@@ -80,8 +85,9 @@
 
   <footer class="site-footer" id="siteFooter"></footer>
 
-  <script src="/assets/js/common.js"></script>
-  <script src="/assets/js/ai-engine.js"></script>
+  <script src="/assets/js/icons.js?v=20261116b"></script>
+  <script src="/assets/js/common.js?v=20261116b"></script>
+  <script src="/assets/js/ai-engine.js?v=20261116b"></script>
   <script>
     let currentResults = [], currentParams = {};
 
@@ -96,21 +102,33 @@
       return el ? el.dataset.value : '简洁';
     }
 
-    async function handleGenerate() {
-      const work = document.getElementById('workInput').value.trim();
-      if (!work) { showToast('请先填写本周工作内容'); return; }
-      const name = document.getElementById('nameInput').value.trim();
+    let _busy = false;
 
+    async function handleGenerate() {
+      if (_busy) return;
+
+      const topicInput = document.getElementById('topicInput') || document.getElementById('workInput') || document.getElementById('keywordInput') || document.getElementById('situationInput');
+      const rawVal = topicInput ? topicInput.value.trim() : '';
+      // 只有朋友圈/标题/周报/高情商需要非空校验；取名允许为空
+      const needInput = true;
+      if (needInput && !rawVal) { showToast('请先填写内容'); return; }
+
+      _busy = true;
       const btn = document.getElementById('generateBtn');
+      const origHtml = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
-      document.getElementById('resultArea').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p>正在整理你的工作周报...</p></div>`;
-      document.getElementById('resultActions').style.display = 'none';
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;"></span> 生成中...';
+
+      const resultArea = document.getElementById('resultArea');
+      if (resultArea) resultArea.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p>正在生成，请稍候...</p></div>';
+      const actions = document.getElementById('resultActions');
+      if (actions) actions.style.display = 'none';
 
       try {
+        const work = document.getElementById('workInput').value.trim();
+        const name = document.getElementById('nameInput').value.trim();
         currentParams = { work, style: getSelectedStyle(), name };
         let results = await generate('weekly-report', currentParams);
-        // 如果有姓名，加个开头
         if (name && results[0] && results[0].title) {
           results = [{ title: '👤 汇报人', content: name }, ...results];
         }
@@ -119,10 +137,13 @@
         saveHistory('weekly-report', currentParams, currentResults);
         renderHistory('historyList', 'weekly-report', restoreHistory);
       } catch (e) {
-        showToast('生成失败，请重试'); console.error(e);
+        showToast('生成失败，请重试');
+        console.error(e);
+        if (resultArea) resultArea.innerHTML = '<div class="result-empty"><div class="result-empty-icon">😕</div><p>生成失败，请点击重试</p></div>';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '📝 生成周报';
+        _busy = false;
       }
     }
 

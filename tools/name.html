@@ -7,9 +7,14 @@
   <meta name="description" content="免费的AI取名神器，支持宝宝起名、宠物取名、店铺命名，古风、现代、可爱、大气多种风格，寓意吉祥又好听。">
   <meta name="keywords" content="取名,宝宝起名,宠物名字,店铺取名,名字生成器,AI取名,起名神器">
   <link rel="canonical" href="/tools/name.html">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20261116b">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"SoftwareApplication","name":"AI取名神器","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"}}
+  
+    // 输入框 Ctrl/Cmd + Enter 快速生成
+    document.addEventListener('keydown', function(e){
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); }
+    });
   </script>
 </head>
 <body data-tool="name">
@@ -21,7 +26,7 @@
     </div>
 
     <div class="tool-header">
-      <div class="tool-header-icon" style="background:#d1fae5;">🎋</div>
+      <div class="tool-header-icon" data-icon="name" data-size="64" data-radius="18"></div>
       <h1>AI 取名神器</h1>
       <p>宝宝、宠物、店铺都能取，寓意美好又好听，灵感源源不断</p>
     </div>
@@ -85,8 +90,9 @@
 
   <footer class="site-footer" id="siteFooter"></footer>
 
-  <script src="/assets/js/common.js"></script>
-  <script src="/assets/js/ai-engine.js"></script>
+  <script src="/assets/js/icons.js?v=20261116b"></script>
+  <script src="/assets/js/common.js?v=20261116b"></script>
+  <script src="/assets/js/ai-engine.js?v=20261116b"></script>
   <script>
     let currentResults = [], currentParams = {};
 
@@ -105,25 +111,42 @@
     setupChips('typeChips');
     setupChips('styleChips');
 
+    let _busy = false;
+
     async function handleGenerate() {
-      const keyword = document.getElementById('keywordInput').value.trim();
+      if (_busy) return;
+
+      const topicInput = document.getElementById('topicInput') || document.getElementById('workInput') || document.getElementById('keywordInput') || document.getElementById('situationInput');
+      const rawVal = topicInput ? topicInput.value.trim() : '';
+      // 只有朋友圈/标题/周报/高情商需要非空校验；取名允许为空
+      const needInput = false;
+      if (needInput && !rawVal) { showToast('请先填写内容'); return; }
+
+      _busy = true;
       const btn = document.getElementById('generateBtn');
+      const origHtml = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;"></span> 生成中...';
-      document.getElementById('resultArea').innerHTML = `<div class="loading-wrap"><div class="spinner"></div><p>正在为你取好名字...</p></div>`;
-      document.getElementById('resultActions').style.display = 'none';
+      btn.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;"></span> 生成中...';
+
+      const resultArea = document.getElementById('resultArea');
+      if (resultArea) resultArea.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p>正在生成，请稍候...</p></div>';
+      const actions = document.getElementById('resultActions');
+      if (actions) actions.style.display = 'none';
 
       try {
-        currentParams = { type: getSelected('typeChips'), keyword, style: getSelected('styleChips'), count: 10 };
+        currentParams = { type: getSelected('typeChips'), keyword: document.getElementById('keywordInput').value.trim(), style: getSelected('styleChips'), count: 10 };
         currentResults = await generate('name', currentParams);
         renderResults();
         saveHistory('name', currentParams, currentResults);
         renderHistory('historyList', 'name', restoreHistory);
       } catch (e) {
-        showToast('生成失败，请重试'); console.error(e);
+        showToast('生成失败，请重试');
+        console.error(e);
+        if (resultArea) resultArea.innerHTML = '<div class="result-empty"><div class="result-empty-icon">😕</div><p>生成失败，请点击重试</p></div>';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '🎋 开始取名';
+        _busy = false;
       }
     }
 
